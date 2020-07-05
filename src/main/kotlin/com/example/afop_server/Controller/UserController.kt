@@ -25,7 +25,6 @@ class UserController(private val passwordEncoder: PasswordEncoder, private val j
         }
 
         val user: User = userRepository.findByEmail(email).orElseThrow(::CSigninFailedException)
-        println("Key : ${user.getPk()}")
         if(!passwordEncoder.matches(password, user.password)) {
             throw CSigninFailedException()
         }
@@ -44,7 +43,27 @@ class UserController(private val passwordEncoder: PasswordEncoder, private val j
         if(!userRepository.findByEmail(email).isEmpty) {
             throw CAlreadyUserException()
         }
-        userRepository.save(User(email, passwordEncoder.encode(password), name, nickName, Collections.singletonList("ROLE_USER")))
+        if(!userRepository.findByNickName(nickName).isEmpty) {
+            throw CAlreadyUserException()
+        }
+        userRepository.save(User(email, passwordEncoder.encode(password), name, nickName, Collections.singletonList("USER")))
         return responseService.getSuccessResult()
+    }
+
+    @GetMapping("/nickname")
+    fun checkNickName(@RequestBody user: Map<String, String>): CommonResult {
+        val nickName = user["nickName"]
+        if(nickName.isNullOrEmpty()) {
+            throw CUserNotFoundException()
+        }
+        if(!userRepository.findByNickName(nickName).isEmpty) {
+            throw CAlreadyUserException()
+        }
+        return responseService.getSuccessResult()
+    }
+
+    @GetMapping("/test")
+    fun test(): String {
+        return Date().toString()
     }
 }

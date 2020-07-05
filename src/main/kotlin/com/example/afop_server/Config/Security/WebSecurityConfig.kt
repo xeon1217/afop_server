@@ -25,12 +25,13 @@ class WebSecurityConfig(private val jwtTokenProvider: JwtTokenProvider) : WebSec
 
     override fun configure(http: HttpSecurity?) {
         http?.let {
-            it.httpBasic().disable()
+            it
+                    .httpBasic().disable()
                     .csrf().disable()
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                     .authorizeRequests()
-                    .antMatchers("/*/signin", "/*/signup").permitAll()
+                    .antMatchers("/*/signin", "/*/signup", "/*/nickname").permitAll()
                     .antMatchers(HttpMethod.GET, "/i18n/exception/**").permitAll()
                     .anyRequest().hasRole("USER")
                     .and()

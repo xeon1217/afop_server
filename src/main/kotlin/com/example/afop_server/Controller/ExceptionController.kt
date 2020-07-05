@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController
 class ExceptionController {
     @GetMapping("/entrypoint")
     fun entrypointException(): CommonResult {
-        println("sadsadas")
-        throw CAuthenticationEntryPointException("asdsad")
+        throw CAuthenticationEntryPointException()
     }
 }

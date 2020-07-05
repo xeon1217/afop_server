@@ -14,7 +14,7 @@ class User (private val email: String,
             private val name: String,
             private val nickName: String,
             @ElementCollection(fetch = FetchType.EAGER)
-            private val roles: List<String>) : UserDetails{
+            private val roles: List<String>) : UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private val id: Long? = null

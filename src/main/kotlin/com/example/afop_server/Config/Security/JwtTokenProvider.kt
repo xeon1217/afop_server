@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetails
@@ -17,17 +18,19 @@ import javax.servlet.http.HttpServletRequest
 
 @Component
 class JwtTokenProvider (private val userDetailsService: CUserDetailService){
-    private var secretKey: String = "dkwlqdprkrhtlvek." //Key
+    @Value("\${spring.jwt.secret}")
+    private lateinit var secretKey: String //Key
     private val tokenValidTime: Long = 1000L * 60 * 60 //token 유효시간 1시간
 
-    init {
+    @PostConstruct
+    fun init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.toByteArray())
     }
 
     fun createToken(userPk: String, roles: List<String>): String {
         val claims: Claims = Jwts.claims().setSubject(userPk)
-        claims.put("roles", roles)
-        val now: Date = Date()
+        claims["roles"] = roles
+        val now = Date()
 
         return Jwts.builder()
                 .setClaims(claims)
