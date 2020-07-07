@@ -31,7 +31,7 @@ class WebSecurityConfig(private val jwtTokenProvider: JwtTokenProvider) : WebSec
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                     .authorizeRequests()
-                    .antMatchers("/*/signin", "/*/signup", "/*/nickname").permitAll()
+                    .antMatchers("/auth/**").permitAll()
                     .antMatchers(HttpMethod.GET, "/i18n/exception/**").permitAll()
                     .anyRequest().hasRole("USER")
                     .and()

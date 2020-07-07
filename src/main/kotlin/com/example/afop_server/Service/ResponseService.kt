@@ -24,11 +24,19 @@ class ResponseService {
         return CommonResult(true, CommonResponse.SUCCESS.code, CommonResponse.SUCCESS.msg)
     }
 
+    fun getSuccessResult(code: Int, msg: String): CommonResult {
+        return CommonResult(false, code, msg)
+    }
+
     fun getFailResult(): CommonResult {
         return CommonResult(false, CommonResponse.FAIL.code, CommonResponse.FAIL.msg)
     }
 
     fun getFailResult(code: Int, msg: String): CommonResult {
         return CommonResult(false, code, msg)
+    }
+
+    fun getFailResult(data: String, code: Int, msg: String): SingleResult<String> {
+        return SingleResult(data, CommonResult(false, code, msg))
     }
 }

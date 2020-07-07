@@ -30,7 +30,7 @@ class ExceptionAdvice(private val responseService: ResponseService, private val 
 
     @ExceptionHandler(CSigninFailedException::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    protected fun cEmailSigninFailedException(request: HttpServletRequest, e: Exception): CommonResult {
+    protected fun cSigninFailedException(request: HttpServletRequest, e: Exception): CommonResult {
         return responseService.getFailResult(getMessage("signinFailed.code").toInt(), getMessage("signinFailed.msg"))
     }
 

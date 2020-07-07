@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
-@RequestMapping("/v1")
-class UserController(private val passwordEncoder: PasswordEncoder, private val jwtTokenProvider: JwtTokenProvider, private val userRepository: UserRepository, private val responseService: ResponseService) {
+@RequestMapping("/auth")
+class AuthController(private val passwordEncoder: PasswordEncoder, private val jwtTokenProvider: JwtTokenProvider, private val userRepository: UserRepository, private val responseService: ResponseService) {
     @PostMapping("/signin")
     fun signin(@RequestBody user: Map<String, String>): SingleResult<String> {
         val email = user["email"]
@@ -50,20 +50,15 @@ class UserController(private val passwordEncoder: PasswordEncoder, private val j
         return responseService.getSuccessResult()
     }
 
-    @GetMapping("/nickname")
-    fun checkNickName(@RequestBody user: Map<String, String>): CommonResult {
-        val nickName = user["nickName"]
-        if(nickName.isNullOrEmpty()) {
-            throw CUserNotFoundException()
+    @RequestMapping(path = ["/signup/{email}"], method = [RequestMethod.GET])
+    fun doubleCheckEmail(@PathVariable("email") email: String): CommonResult {
+        if(email.isEmpty()) {
+            throw CUserNotFoundException() // 입력이 비어있음
         }
-        if(!userRepository.findByNickName(nickName).isEmpty) {
+
+        if(!userRepository.findByEmail(email).isEmpty) {
             throw CAlreadyUserException()
         }
         return responseService.getSuccessResult()
-    }
-
-    @GetMapping("/test")
-    fun test(): String {
-        return Date().toString()
     }
 }

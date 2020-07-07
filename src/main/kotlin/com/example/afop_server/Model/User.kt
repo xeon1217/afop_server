@@ -45,6 +45,7 @@ class User (private val email: String,
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return roles.stream().map { role -> SimpleGrantedAuthority("ROLE_$role") }.collect(Collectors.toSet())
+        //return roles.stream().map { role -> SimpleGrantedAuthority("ROLE_$role") }.collect(Collectors.toSet())
         //.map(SimpleGrantedAuthority::new) 코틀린 대응 https://stackoverrun.com/ko/q/12453840
         //또는 .map(::SimpleGrantedAuthority)
     }
