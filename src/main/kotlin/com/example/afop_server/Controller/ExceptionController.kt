@@ -6,6 +6,11 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * 예외 관련
+ * 각종 예외들을 담당하는 Controller
+ */
+
 @RestController
 @RequestMapping("/i18n/exception")
 class ExceptionController {

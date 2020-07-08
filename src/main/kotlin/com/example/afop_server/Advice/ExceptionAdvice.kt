@@ -1,9 +1,6 @@
 package com.example.afop_server.Advice
 
-import com.example.afop_server.Advice.Exception.CAlreadyUserException
-import com.example.afop_server.Advice.Exception.CAuthenticationEntryPointException
-import com.example.afop_server.Advice.Exception.CSigninFailedException
-import com.example.afop_server.Advice.Exception.CUserNotFoundException
+import com.example.afop_server.Advice.Exception.*
 import com.example.afop_server.Response.CommonResult
 import com.example.afop_server.Service.ResponseService
 import org.springframework.context.MessageSource
@@ -17,31 +14,37 @@ import javax.servlet.http.HttpServletRequest
 @RestControllerAdvice
 class ExceptionAdvice(private val responseService: ResponseService, private val messageSource: MessageSource) {
     @ExceptionHandler(Exception::class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected fun defaultException(request: HttpServletRequest, e: Exception): CommonResult {
         return responseService.getFailResult(getMessage("unKnown.code").toInt(), getMessage("unKnown.msg"))
     }
 
+    @ExceptionHandler(CHttpRequestMethodNotSupportedException::class)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    protected fun cHttpRequestMethodNotSupportedException(request: HttpServletRequest, e: Exception): CommonResult {
+        return responseService.getFailResult(getMessage("unKnown.code").toInt(), getMessage("unKnown.msg"))
+    }
+
     @ExceptionHandler(CUserNotFoundException::class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected fun cUserNotFoundException(request: HttpServletRequest, e: Exception): CommonResult {
         return responseService.getFailResult(getMessage("userNotFound.code").toInt(), getMessage("userNotFound.msg"))
     }
 
     @ExceptionHandler(CSigninFailedException::class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected fun cSigninFailedException(request: HttpServletRequest, e: Exception): CommonResult {
         return responseService.getFailResult(getMessage("signinFailed.code").toInt(), getMessage("signinFailed.msg"))
     }
 
     @ExceptionHandler(CAuthenticationEntryPointException::class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     protected fun cAuthenticationEntryPointException(request: HttpServletRequest, e: Exception): CommonResult {
         return responseService.getFailResult(getMessage("entryPointException.code").toInt(), getMessage("entryPointException.msg"))
     }
 
     @ExceptionHandler(CAlreadyUserException::class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected fun cAlreadyUserException(request: HttpServletRequest, e: Exception): CommonResult {
         return responseService.getFailResult(getMessage("alreadyUser.code").toInt(), getMessage("alreadyUser.msg"))
     }
