@@ -30,10 +30,10 @@ class WebSecurityConfig(private val jwtTokenProvider: JwtTokenProvider) : WebSec
                     .csrf().disable()
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
-                    .authorizeRequests()
-                    .antMatchers("/auth/**").permitAll()
-                    .antMatchers(HttpMethod.GET, "/i18n/exception/**").permitAll()
-                    .anyRequest().hasRole("USER")
+                    .authorizeRequests() // 리소스들의 접근 권한 설정
+                    .antMatchers("/auth/**").permitAll() // 인증 관련 리소스(로그인, 회원가입 등)에 접근을 허가함
+                    .antMatchers(HttpMethod.GET, "/i18n/exception/**").permitAll() // 예외 관련 리소스에 접근을 허가함
+                    .anyRequest().hasRole("USER") // 그 외의 리소스는 해당 권한(User)이 있어야 접근 가능
                     .and()
                     .exceptionHandling().authenticationEntryPoint(CAuthenticationEntryPoint())
                     .and()

@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest
 class JwtTokenProvider (private val userDetailsService: CUserDetailService){
     @Value("\${spring.jwt.secret}")
     private lateinit var secretKey: String //Key
-    private val tokenValidTime: Long = 1000L * 60 * 60 //token 유효시간 1시간
+    private val tokenValidTime: Long = 1000L * 60 * 60 * 12 //token 유효시간 12시간
 
     @PostConstruct
     fun init() {

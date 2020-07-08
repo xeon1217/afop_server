@@ -10,7 +10,6 @@ import java.util.*
 @Service
 class CUserDetailService(private val userRepository: UserRepository) : UserDetailsService {
     override fun loadUserByUsername(username: String): UserDetails {
-        println(userRepository.findById(username.toLong()).get().getRole())
         return userRepository.findById(username.toLong()).orElseThrow(::CUserNotFoundException)
     }
 }
