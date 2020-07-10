@@ -1,7 +1,7 @@
 package com.example.afop_server.Advice.Exception
 
-//이미 존재하는 계정
-class CAlreadyUserException : RuntimeException {
+//잘못된 코드 입력
+class CWrongCodeException : RuntimeException {
     constructor(msg: String?, t: Throwable?) : super(msg, t) {}
     constructor(msg: String?) : super(msg) {}
     constructor() : super() {}

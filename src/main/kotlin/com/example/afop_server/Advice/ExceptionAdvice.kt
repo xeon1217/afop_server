@@ -16,37 +16,67 @@ class ExceptionAdvice(private val responseService: ResponseService, private val 
     @ExceptionHandler(Exception::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected fun defaultException(request: HttpServletRequest, e: Exception): CommonResult {
-        return responseService.getFailResult(getMessage("unKnown.code").toInt(), getMessage("unKnown.msg"))
+        return responseService.getFailResult(getMessage("unKnown.code").toInt(), getMessage("unKnown.title_msg"))
     }
 
     @ExceptionHandler(CHttpRequestMethodNotSupportedException::class)
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
-    protected fun cHttpRequestMethodNotSupportedException(request: HttpServletRequest, e: Exception): CommonResult {
-        return responseService.getFailResult(getMessage("unKnown.code").toInt(), getMessage("unKnown.msg"))
-    }
-
-    @ExceptionHandler(CUserNotFoundException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected fun cUserNotFoundException(request: HttpServletRequest, e: Exception): CommonResult {
-        return responseService.getFailResult(getMessage("userNotFound.code").toInt(), getMessage("userNotFound.msg"))
-    }
-
-    @ExceptionHandler(CSigninFailedException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected fun cSigninFailedException(request: HttpServletRequest, e: Exception): CommonResult {
-        return responseService.getFailResult(getMessage("signinFailed.code").toInt(), getMessage("signinFailed.msg"))
+    protected fun cHttpRequestMethodNotSupportedException(request: HttpServletRequest, e: CHttpRequestMethodNotSupportedException): CommonResult {
+        return responseService.getFailResult(getMessage("unKnown.code").toInt(), getMessage("unKnown.title_msg"))
     }
 
     @ExceptionHandler(CAuthenticationEntryPointException::class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    protected fun cAuthenticationEntryPointException(request: HttpServletRequest, e: Exception): CommonResult {
-        return responseService.getFailResult(getMessage("entryPointException.code").toInt(), getMessage("entryPointException.msg"))
+    protected fun cAuthenticationEntryPointException(request: HttpServletRequest, e: CAuthenticationEntryPointException): CommonResult {
+        return responseService.getFailResult(getMessage("entryPointException.code").toInt(), getMessage("entryPointException.title_msg"))
     }
 
-    @ExceptionHandler(CAlreadyUserException::class)
+    @ExceptionHandler(CUserNotFoundException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected fun cAlreadyUserException(request: HttpServletRequest, e: Exception): CommonResult {
-        return responseService.getFailResult(getMessage("alreadyUser.code").toInt(), getMessage("alreadyUser.msg"))
+    protected fun cUserNotFoundException(request: HttpServletRequest, e: CUserNotFoundException): CommonResult {
+        return responseService.getFailResult(getMessage("userNotFound.code").toInt(), getMessage("userNotFound.title_msg"), getMessage("userNotFound.do_msg"))
+    }
+
+    @ExceptionHandler(CSigninFailedException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected fun cSigninFailedException(request: HttpServletRequest, e: CSigninFailedException): CommonResult {
+        return responseService.getFailResult(getMessage("signinFailed.code").toInt(), getMessage("signinFailed.title_msg"), getMessage("signinFailed.do_msg"))
+    }
+
+    @ExceptionHandler(CAlreadyUserEmailException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected fun cAlreadyUserEmailException(request: HttpServletRequest, e: CAlreadyUserEmailException): CommonResult {
+        return responseService.getFailResult(getMessage("alreadyUserEmail.code").toInt(), getMessage("alreadyUserEmail.title_msg"), getMessage("alreadyUserEmail.do_msg"))
+    }
+
+    @ExceptionHandler(CAlreadyUserNickNameException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected fun cAlreadyUserNickNameException(request: HttpServletRequest, e: CAlreadyUserNickNameException): CommonResult {
+        return responseService.getFailResult(getMessage("alreadyUserNickName.code").toInt(), getMessage("alreadyUserNickName.title_msg"), getMessage("alreadyUserNickName.do_msg"))
+    }
+
+    @ExceptionHandler(CEmptyDataException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected fun cEmptyDataException(request: HttpServletRequest, e: CEmptyDataException): CommonResult {
+        return responseService.getFailResult(getMessage("emptyData.code").toInt(), getMessage("emptyData.title_msg"), getMessage("emptyData.do_msg"))
+    }
+
+    @ExceptionHandler(CSignUpUserException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected fun cSignUpUserException(request: HttpServletRequest, e: CSignUpUserException): CommonResult {
+        return responseService.getFailResult(getMessage("signupUser.code").toInt(), getMessage("signupUser.title_msg"), getMessage("signupUser.do_msg"))
+    }
+
+    @ExceptionHandler(CWrongCodeException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected fun cWrongCodeException(request: HttpServletRequest, e: CWrongCodeException): CommonResult {
+        return responseService.getFailResult(getMessage("wrongCode.code").toInt(), getMessage("wrongCode.title_msg"), getMessage("wrongCode.do_msg"))
+    }
+
+    @ExceptionHandler(CExpiredUserException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected fun cExpiredUserException(request: HttpServletRequest, e: CExpiredUserException): CommonResult {
+        return responseService.getFailResult(getMessage("wrongCode.code").toInt(), getMessage("wrongCode.title_msg"), getMessage("wrongCode.do_msg"))
     }
 
     private fun getMessage(code: String): String {
