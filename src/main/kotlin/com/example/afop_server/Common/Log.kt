@@ -6,18 +6,22 @@ class Log {
     companion object {
         var debug: Boolean = true
 
-        fun d(tag: String?, msg: String) {
+        fun debug(tag: String?, msg: String) {
             if(debug) {
                 println("${now()} :: Debug --- [${tag}] : ${msg}")
             }
         }
 
-        fun i() {
+        fun info(tag: String?, msg: String) {
             println("")
         }
 
-        fun e() {
+        fun error(tag: String?, msg: String) {
             println("")
+        }
+
+        fun warn(tag: String?, msg: String) {
+            println("${now()} :: Debug --- [${tag}] : ${msg}")
         }
 
         fun now(): Date {
