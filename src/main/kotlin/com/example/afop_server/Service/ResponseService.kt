@@ -13,30 +13,30 @@ class ResponseService {
     }
 
     fun <T> getSingleResult(data: T): SingleResult<T> {
-        return SingleResult(data, CommonResult(true, CommonResponse.SUCCESS.code, CommonResponse.SUCCESS.msg))
+        return SingleResult(data, true, CommonResponse.SUCCESS.code, CommonResponse.SUCCESS.msg, "")
     }
 
     fun <T> getListResult(list: List<T>): ListResult<T> {
-        return ListResult(list, CommonResult(true, CommonResponse.SUCCESS.code, CommonResponse.SUCCESS.msg))
+        return ListResult(list, true, CommonResponse.SUCCESS.code, CommonResponse.SUCCESS.msg, "")
     }
 
     fun getSuccessResult(): CommonResult {
-        return CommonResult(true, CommonResponse.SUCCESS.code, CommonResponse.SUCCESS.msg)
+        return CommonResult(true, CommonResponse.SUCCESS.code, CommonResponse.SUCCESS.msg, "")
     }
 
-    fun getSuccessResult(code: Int, msg: String): CommonResult {
-        return CommonResult(false, code, msg)
+    fun getSuccessResult(code: Int, title_msg: String, do_msg: String): CommonResult {
+        return CommonResult(false, code, title_msg, do_msg)
     }
 
     fun getFailResult(): CommonResult {
-        return CommonResult(false, CommonResponse.FAIL.code, CommonResponse.FAIL.msg)
+        return CommonResult(false, CommonResponse.FAIL.code, CommonResponse.FAIL.msg, "")
     }
 
-    fun getFailResult(code: Int, msg: String): CommonResult {
-        return CommonResult(false, code, msg)
+    fun getFailResult(code: Int, title_msg: String): CommonResult {
+        return CommonResult(false, code, title_msg, "")
     }
 
-    fun getFailResult(data: String, code: Int, msg: String): SingleResult<String> {
-        return SingleResult(data, CommonResult(false, code, msg))
+    fun getFailResult(code: Int, title_msg: String, do_msg: String): CommonResult {
+        return CommonResult(false, code, title_msg, do_msg)
     }
 }
