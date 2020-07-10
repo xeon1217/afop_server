@@ -21,6 +21,7 @@ class JwtTokenProvider (private val userDetailsService: CUserDetailService){
     @Value("\${spring.jwt.secret}")
     private lateinit var secretKey: String //Key
     private val tokenValidTime: Long = 1000L * 60 * 60 * 12 //token 유효시간 12시간
+    private val changePasswordTokenValidTime: Long = 1000L * 600 //token 유효시간 10분
 
     @PostConstruct
     fun init() {
@@ -36,6 +37,19 @@ class JwtTokenProvider (private val userDetailsService: CUserDetailService){
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(Date(now.time + tokenValidTime))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact()
+    }
+
+    fun createChangePasswordToken(userPk: String, roles: List<String>): String {
+        val claims: Claims = Jwts.claims().setSubject(userPk)
+        claims["roles"] = roles
+        val now = Date()
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(Date(now.time + changePasswordTokenValidTime))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact()
     }
