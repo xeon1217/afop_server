@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository
 import java.util.*
 
 interface UserRepository : JpaRepository <User, Long> {
-    fun findByEmail(email: String) : Optional<User>
-    fun findByNickName(nickName: String) : Optional<User>
+    fun findByEmail(email: String) : User?
+    fun findByNickName(nickName: String) : User?
 }
 
 // https://shlee0882.tistory.com/257 JPA CURD 관련
