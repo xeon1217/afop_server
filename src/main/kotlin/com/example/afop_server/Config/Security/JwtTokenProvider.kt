@@ -1,5 +1,6 @@
 package com.example.afop_server.Config.Security
 
+import com.example.afop_server.Common.Log
 import com.example.afop_server.Service.CUserDetailService
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
@@ -21,7 +22,7 @@ class JwtTokenProvider (private val userDetailsService: CUserDetailService){
     @Value("\${spring.jwt.secret}")
     private lateinit var secretKey: String //Key
     private val tokenValidTime: Long = 1000L * 60 * 60 * 12 //token 유효시간 12시간
-    private val changePasswordTokenValidTime: Long = 1000L * 600 //token 유효시간 10분
+    private val changePasswordTokenValidTime: Long = 1000L * 60 //token 유효시간 1분
 
     @PostConstruct
     fun init() {

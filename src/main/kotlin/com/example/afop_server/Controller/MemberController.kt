@@ -1,9 +1,15 @@
 package com.example.afop_server.Controller
 
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RestController
+import com.example.afop_server.Advice.Exception.Auth.UserNotFoundException
+import com.example.afop_server.Advice.Exception.Auth.WrongPasswordException
+import com.example.afop_server.Advice.Exception.Common.EmptyDataException
+import com.example.afop_server.Repository.UserRepository
+import com.example.afop_server.Response.CommonResult
+import com.example.afop_server.Service.ResponseService
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.web.bind.annotation.*
 
 /**
  * 회원 정보 관련
@@ -12,16 +18,41 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/member")
-class MemberController {
-    fun changePassword() {
+class MemberController(private val passwordEncoder: PasswordEncoder, private val userRepository: UserRepository, private val responseService: ResponseService) {
 
+    @RequestMapping(path = ["/password"], method = [RequestMethod.PATCH])
+    fun changePassword(@RequestBody body: Map<String, String>): CommonResult {
+        val oPassword = body["oPassword"] // 원래 패스워드
+        val password = body["password"] // 기준 패스워드
+        val rPassword = body["rPassword"] // 재 확인 패스워드
+        val authentication: Authentication = SecurityContextHolder.getContext().authentication
+
+        //값이 유효한지 검사
+        if (oPassword.isNullOrEmpty() || password.isNullOrEmpty() || rPassword.isNullOrEmpty()) {
+            throw EmptyDataException()
+        }
+
+        userRepository.findByEmail(authentication.name)?.let { user ->
+            if(!passwordEncoder.matches(oPassword, user.password)) {
+                throw Exception() // 기존 패스워드가 맞지 않음!
+            }
+
+            if(password != rPassword) {
+                throw WrongPasswordException() // 기준 패스워드와 확인 패스워드가 일치하지 않음!
+            }
+
+            user.password = passwordEncoder.encode(password)
+            user.credentialsActivation()
+            userRepository.save(user)
+            return responseService.getSuccessResult()
+        }
+        throw UserNotFoundException()
     }
 
-    fun changeNickname() {
-
+    @RequestMapping(path = ["/nickname"], method = [RequestMethod.PATCH])
+    fun changeNickname(@RequestParam nickName: String): CommonResult {
+        return responseService.getSuccessResult()
     }
 
-    fun changeEmail() {
-
-    }
+    fun changeEmail() {}
 }

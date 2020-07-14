@@ -1,11 +1,8 @@
 package com.example.afop_server.Model
 
-import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
-import java.awt.print.Book
-import java.util.*
 import java.util.stream.Collectors
 import javax.persistence.*
 
@@ -37,6 +34,10 @@ class User (private var email: String,
         return password
     }
 
+    fun setPassword(_password: String) {
+        password = _password
+    }
+
     fun getName(): String {
         return name
     }
@@ -59,6 +60,10 @@ class User (private var email: String,
 
     fun getRole(): List<String> {
         return roles
+    }
+
+    fun setRole(_roles: List<String>) {
+        roles = _roles
     }
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
