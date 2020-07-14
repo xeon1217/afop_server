@@ -1,7 +1,6 @@
-package com.example.afop_server.Advice.Exception
+package com.example.afop_server.Advice.Exception.Auth
 
-//이미 존재하는 계정
-class CAlreadyUserNickNameException : RuntimeException {
+class SignUpUserException : RuntimeException {
     constructor(msg: String?, t: Throwable?) : super(msg, t) {}
     constructor(msg: String?) : super(msg) {}
     constructor() : super() {}

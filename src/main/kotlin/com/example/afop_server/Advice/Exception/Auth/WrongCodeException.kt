@@ -1,7 +1,6 @@
-package com.example.afop_server.Advice.Exception
+package com.example.afop_server.Advice.Exception.Auth
 
-//잘못된 코드 입력
-class CWrongCodeException : RuntimeException {
+class WrongCodeException : RuntimeException {
     constructor(msg: String?, t: Throwable?) : super(msg, t) {}
     constructor(msg: String?) : super(msg) {}
     constructor() : super() {}

@@ -1,7 +1,6 @@
-package com.example.afop_server.Advice.Exception
+package com.example.afop_server.Advice.Exception.Auth
 
-//로그인에 실패함
-class CSigninFailedException : RuntimeException {
+class ExpiredPasswordException : RuntimeException {
     constructor(msg: String?, t: Throwable?) : super(msg, t) {}
     constructor(msg: String?) : super(msg) {}
     constructor() : super() {}

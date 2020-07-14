@@ -1,7 +1,6 @@
-package com.example.afop_server.Advice.Exception
+package com.example.afop_server.Advice.Exception.Auth
 
-//유저가 존재하지 않음
-class CUserNotFoundException : RuntimeException {
+class AlreadyUserEmailException : RuntimeException {
     constructor(msg: String?, t: Throwable?) : super(msg, t) {}
     constructor(msg: String?) : super(msg) {}
     constructor() : super() {}
