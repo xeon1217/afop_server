@@ -164,7 +164,7 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
     }
 
     @RequestMapping(path = ["/email/{nickName}"], method = [RequestMethod.GET])
-    fun findEmail(@PathVariable(value = "{nickName}", required = true) nickName: String, @RequestParam name: String): SingleResult<Map<String, String>> {
+    fun findEmail(@PathVariable nickName: String, @RequestParam name: String): SingleResult<Map<String, String>> {
 
         //값이 유효한지 검사
         if (name.isEmpty()) {
