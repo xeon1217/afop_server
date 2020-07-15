@@ -33,8 +33,8 @@ class WebSecurityConfig(private val jwtTokenProvider: JwtTokenProvider) : WebSec
                     .authorizeRequests() // 리소스들의 접근 권한 설정
                     .antMatchers("/auth/**").permitAll() // 인증 관련 리소스(로그인, 회원가입 등)에 접근을 허가함
                     .antMatchers(HttpMethod.GET, "/i18n/exception/**").permitAll() // 예외 관련 리소스에 접근을 허가함
-                    .antMatchers(HttpMethod.PATCH,"/auth/password").hasRole("ROLE_PW") // 비 로그인한 유저의 패스워드 변경은 토큰을 발급받아야 함
-                    .antMatchers("/admin/**").hasRole("ROLE_ADMIN")
+                    .antMatchers(HttpMethod.PATCH,"/auth/password").hasRole("PW") // 비 로그인한 유저의 패스워드 변경은 토큰을 발급받아야 함
+                    .antMatchers("/admin/**").hasRole("ADMIN")
                     .anyRequest().authenticated() // 그 외의 리소스는 인증된 회원만 사용 가능
                     .and()
                     .exceptionHandling().authenticationEntryPoint(CAuthenticationEntryPoint())
