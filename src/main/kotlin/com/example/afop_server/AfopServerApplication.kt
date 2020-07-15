@@ -6,8 +6,6 @@ import org.springframework.boot.runApplication
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory
 import org.springframework.context.annotation.Bean
-import org.springframework.security.crypto.factory.PasswordEncoderFactories
-import org.springframework.security.crypto.password.PasswordEncoder
 
 @SpringBootApplication
 class AfopServerApplication {
@@ -23,6 +21,7 @@ class AfopServerApplication {
         return factory
     }
 }
+
 
 fun main(args: Array<String>) {
     runApplication<AfopServerApplication>(*args)
