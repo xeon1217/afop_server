@@ -16,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
-
 /**
  * 회원 인증 관련
  * 회원의 회원가입 및 로그인 과정을 담당하는 Controller
@@ -102,13 +101,17 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
         return responseService.getSuccessResult()
     }
 
+    @RequestMapping(path = ["/signup"], method = [RequestMethod.PATCH])
+    fun signUpCodeNull(): CommonResult {
+        throw EmptyDataException()
+    }
 
     //회원가입 전 인증코드 입력
     @RequestMapping(path = ["/signup/{email}"], method = [RequestMethod.PATCH])
     fun signUpCode(@PathVariable email: String, @RequestParam code: String): CommonResult {
 
         //값이 유효한지 검사
-        if (email.isEmpty() || code.isEmpty()) {
+        if (code.isEmpty()) {
             throw EmptyDataException()
         }
 
@@ -131,14 +134,14 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
         throw UserNotFoundException() //해당되는 계정이 존재하지 않음
     }
 
+    @RequestMapping(path = ["/signup"], method = [RequestMethod.GET])
+    fun doubleCheckEmailNull(): CommonResult {
+        throw EmptyDataException()
+    }
+
     //회원가입 전 이메일 중복 확인
     @RequestMapping(path = ["/signup/{email}"], method = [RequestMethod.GET])
     fun doubleCheckEmail(@PathVariable email: String): CommonResult {
-
-        //값이 유효한지 검사
-        if (email.isEmpty()) {
-            throw EmptyDataException()
-        }
 
         userRepository.findByEmail(email)?.let { user ->
             if (!user.isEnabled) { //회원가입중인 계정인가?
@@ -154,11 +157,17 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
     }
 
     //이메일 찾기
+
+    @RequestMapping(path = ["/email"], method = [RequestMethod.GET])
+    fun findEmailNull() {
+        throw EmptyDataException()
+    }
+
     @RequestMapping(path = ["/email/{nickName}"], method = [RequestMethod.GET])
-    fun findEmail(@PathVariable nickName: String, @RequestParam name: String): SingleResult<Map<String, String>> {
+    fun findEmail(@PathVariable(value = "{nickName}", required = true) nickName: String, @RequestParam name: String): SingleResult<Map<String, String>> {
 
         //값이 유효한지 검사
-        if (nickName.isEmpty() || name.isEmpty()) {
+        if (name.isEmpty()) {
             throw EmptyDataException()
         }
 
@@ -180,12 +189,17 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
         throw UserNotFoundException() //해당되는 계정이 존재하지 않음
     }
 
+    @RequestMapping(path = ["/password"], method = [RequestMethod.GET])
+    fun findPasswordNull() {
+        throw EmptyDataException()
+    }
+
     //패스워드 찾기
     @RequestMapping(path = ["/password/{email}"], method = [RequestMethod.GET])
-    fun findPassword(@PathVariable("email") email: String, @RequestParam name: String): CommonResult {
+    fun findPassword(@PathVariable email: String, @RequestParam name: String): CommonResult {
 
         //값이 유효한지 검사
-        if (email.isEmpty() || name.isEmpty()) {
+        if (name.isEmpty()) {
             throw EmptyDataException()
         }
 
@@ -214,7 +228,7 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
     fun findPasswordCode(@PathVariable email: String, @RequestParam code: String): SingleResult<Map<String, String>> {
 
         //값이 유효한지 검사
-        if (email.isEmpty() || code.isEmpty()) {
+        if (code.isEmpty()) {
             throw EmptyDataException()
         }
 
