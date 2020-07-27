@@ -104,7 +104,7 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
         return responseService.getSuccessResult(2011, "가입 신청 성공!", "이메일로 보내진 인증 코드를 입력하여 회원가입을 마쳐주세요.")
     }
 
-    @RequestMapping(path = ["/signup/{email}"], method = [RequestMethod.GET])
+    @RequestMapping(path = ["/code/{email}"], method = [RequestMethod.GET])
     fun testCode(@PathVariable email: String): String {
         userRepository.findByEmail(email)?.let {
             return it.getCode()
