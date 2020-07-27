@@ -1,12 +1,16 @@
 package com.example.afop_server.Config.Security
 
+import com.example.afop_server.Advice.Exception.Auth.WrongCodeException
+import com.example.afop_server.Advice.Exception.Common.AuthenticationEntryPointException
 import com.example.afop_server.Common.Log
+import com.example.afop_server.Model.User
 import com.example.afop_server.Service.CUserDetailService
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetails
@@ -18,21 +22,23 @@ import javax.annotation.PostConstruct
 import javax.servlet.http.HttpServletRequest
 
 @Component
-class JwtTokenProvider (private val userDetailsService: CUserDetailService){
+class JwtTokenProvider(private val userDetailsService: CUserDetailService) {
     @Value("\${spring.jwt.secret}")
     private lateinit var secretKey: String //Key
-    private val tokenValidTime: Long = 1000L * 60 * 60 * 12 //token 유효시간 12시간
-    private val changePasswordTokenValidTime: Long = 1000L * 60 //token 유효시간 1분
+    private val tokenValidTime: Long = 1000L * 60 * 60 * 48 //token 유효시간 48시간
+    private val changePasswordTokenValidTime: Long = 1000L * 60 * 30//패스워드 변경 token 유효시간 30분
 
     @PostConstruct
     fun init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.toByteArray())
     }
 
-    fun createToken(userPk: String, roles: List<String>): String {
-        val claims: Claims = Jwts.claims().setSubject(userPk)
-        claims["roles"] = roles
+    fun createToken(user: User): String {
         val now = Date()
+        val claims: Claims = Jwts.claims()
+                .setSubject(user.getPk().toString())
+                .setId(user.getTokenCode())
+        claims["roles"] = user.getRole()
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -42,10 +48,12 @@ class JwtTokenProvider (private val userDetailsService: CUserDetailService){
                 .compact()
     }
 
-    fun createChangePasswordToken(userPk: String, roles: List<String>): String {
-        val claims: Claims = Jwts.claims().setSubject(userPk)
-        claims["roles"] = roles
+    fun createChangePasswordToken(user: User): String {
         val now = Date()
+        val claims: Claims = Jwts.claims()
+                .setSubject(user.getPk().toString())
+                .setId(user.getTokenCode())
+        claims["roles"] = user.getRole()
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -56,11 +64,20 @@ class JwtTokenProvider (private val userDetailsService: CUserDetailService){
     }
 
     fun getUserPk(token: String): String {
+        println(Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).body.subject)
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).body.subject
     }
 
-    fun getAuthentication(token: String): Authentication {
-        val userDetails: UserDetails = userDetailsService.loadUserByUsername(this.getUserPk(token))
+    fun getTokenCode(token: String): String {
+        println(Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).body.id)
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).body.id
+    }
+
+    fun getAuthentication(token: String): Authentication? {
+        val userDetails = userDetailsService.loadUserByUsername(this.getUserPk(token))
+        if (userDetails.getTokenCode() != this.getTokenCode(token)) {
+            return null
+        }
         return UsernamePasswordAuthenticationToken(userDetails, "", userDetails.authorities)
     }
 

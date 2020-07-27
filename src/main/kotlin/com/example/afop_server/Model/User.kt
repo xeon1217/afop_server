@@ -13,7 +13,7 @@ class User (private var email: String,
             private var name: String,
             private var nickName: String,
             private var createDate: Long,
-            private var code: String,
+            private var authCode: String,
             @ElementCollection(fetch = FetchType.EAGER)
             private var roles: List<String>) : UserDetails {
     @Id
@@ -21,6 +21,7 @@ class User (private var email: String,
     private val id: Long? = null
     private var enable: Boolean = false //계정이 만료되었는지? (회원가입 중인지 아닌지를 판별)
     private var credentials: Boolean = true //패스워드가 만료되었는지?
+    private var tokenCode: String = ""
 
     fun getPk(): Long {
         return id!!
@@ -51,11 +52,11 @@ class User (private var email: String,
     }
 
     fun getCode(): String {
-        return code
+        return authCode
     }
 
     fun setCode(_code: String) {
-        code = _code
+        authCode = _code
     }
 
     fun getRole(): List<String> {
@@ -64,6 +65,14 @@ class User (private var email: String,
 
     fun setRole(_roles: List<String>) {
         roles = _roles
+    }
+
+    fun getTokenCode(): String {
+        return tokenCode
+    }
+
+    fun setTokenCode(_code: String) {
+        tokenCode = _code
     }
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {

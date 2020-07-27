@@ -54,7 +54,9 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
             }
 
             if (passwordEncoder.matches(password, user.password)) { //패스워드가 유효한가?
-                return responseService.getSingleResult(mapOf("token" to jwtTokenProvider.createToken(user.getPk().toString(), user.getRole())))
+                user.setTokenCode(createTokenCode())
+                userRepository.save(user)
+                return responseService.getSingleResult(2000, mapOf("token" to jwtTokenProvider.createToken(user)))
             }
         }
         throw SignInFailedException() //해당되는 계정이 존재하지 않음!
@@ -66,7 +68,7 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
     fun signUp(@RequestBody body: Map<String, String>): CommonResult {
         val email = body["email"] // 이메일
         val password = body["password"] // 기준 패스워드
-        val rPassword = body["rPassword"] // 재 확인 패스워드
+        val rPassword = body["vPassword"] // 재 확인 패스워드
         val name = body["name"] // 이름
         val nickName = body["nickName"] // 닉네임
 
@@ -87,18 +89,19 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
             if (!user.isEnabled) { //회원가입중인 계정인가?
                 if ((user.getCode().toLong() + VAILDTIME) < createCode()) { //회원가입 중 코드 입력 시간이 지나 만료된 계정인가?
                     userRepository.deleteById(user.getPk())
-                    userRepository.save(User(email, passwordEncoder.encode(password), name, nickName, createCode(), createCode().toString(), Collections.singletonList("ROLE_USER")))
+                    val code = createCode()
+                    userRepository.save(User(email, passwordEncoder.encode(password), name, nickName, code, code.toString(), Collections.singletonList("ROLE_USER")))
                     //이 곳에 이메일로 인증코드를 보내는 코드를 작성
-                    return responseService.getSuccessResult()
+                    return responseService.getSuccessResult(2011, "가입 신청 성공!", "이메일로 보내진 인증 코드를 입력하여 회원가입을 마쳐주세요.")
                 }
                 throw SignUpUserException() //회원가입 중인 계정임!
             }
             throw AlreadyUserEmailException() //중복됨!
         }
-
-        userRepository.save(User(email, passwordEncoder.encode(password), name, nickName, createCode(), createCode().toString(), Collections.singletonList("ROLE_USER")))
+        val code = createCode()
+        userRepository.save(User(email, passwordEncoder.encode(password), name, nickName, code, code.toString(), Collections.singletonList("ROLE_USER")))
         //이 곳에 이메일로 인증코드를 보내는 코드를 작성
-        return responseService.getSuccessResult()
+        return responseService.getSuccessResult(2011, "가입 신청 성공!", "이메일로 보내진 인증 코드를 입력하여 회원가입을 마쳐주세요.")
     }
 
     @RequestMapping(path = ["/signup"], method = [RequestMethod.PATCH])
@@ -127,7 +130,7 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
                 initCode(user)
                 user.activation()
                 userRepository.save(user)
-                return responseService.getSuccessResult()
+                return responseService.getSuccessResult(2012, "회원가입 완료!", "회원가입에 성공하였습니다.")
             }
             throw WrongCodeException() //인증코드가 틀림!
         }
@@ -135,36 +138,38 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
     }
 
     @RequestMapping(path = ["/signup"], method = [RequestMethod.GET])
-    fun doubleCheckEmailNull(): CommonResult {
+    fun checkEmailNull(): CommonResult {
         throw EmptyDataException()
     }
 
     //회원가입 전 이메일 중복 확인
     @RequestMapping(path = ["/signup/{email}"], method = [RequestMethod.GET])
-    fun doubleCheckEmail(@PathVariable email: String): CommonResult {
+    fun verifyEmail(@PathVariable email: String): CommonResult {
+        if (!email.contains("@")) {
+            throw Exception() //이메일 양식에 맞지 않음
+        }
 
         userRepository.findByEmail(email)?.let { user ->
             if (!user.isEnabled) { //회원가입중인 계정인가?
                 if ((user.getCode().toLong() + VAILDTIME) < createCode()) { //회원가입 중 코드 입력 시간이 지나 만료된 계정인가?
                     userRepository.deleteById(user.getPk())
-                    return responseService.getSuccessResult()
+                    return responseService.getSuccessResult(2010, "사용 가능!", "사용 가능한 이메일 주소입니다.\n사용하시겠습니까?")
                 }
                 throw SignUpUserException() //회원가입 중인 계정임!
             }
             throw AlreadyUserEmailException() //중복됨!
         }
-        return responseService.getSuccessResult()
+        return responseService.getSuccessResult(2010, "사용 가능!", "${email}은(는)\n사용 가능한 이메일 주소입니다.\n사용하시겠습니까?")
     }
 
     //이메일 찾기
-
     @RequestMapping(path = ["/email"], method = [RequestMethod.GET])
     fun findEmailNull() {
         throw EmptyDataException()
     }
 
     @RequestMapping(path = ["/email/{nickName}"], method = [RequestMethod.GET])
-    fun findEmail(@PathVariable nickName: String, @RequestParam name: String): SingleResult<Map<String, String>> {
+    fun findEmail(@PathVariable nickName: String, @RequestParam name: String): SingleResult<String> {
 
         //값이 유효한지 검사
         if (name.isEmpty()) {
@@ -183,7 +188,7 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
 
             //해당되는 계정을 찾음!
             if (user.getName() == name) {
-                return responseService.getSingleResult(mapOf("email" to user.username))
+                return responseService.getSingleResult(2020, "이메일 찾음!", "${name}님의 이메일 주소는 \n${user.username}입니다.\n패스워드도 찾을까요?", user.username)
             }
         }
         throw UserNotFoundException() //해당되는 계정이 존재하지 않음
@@ -217,7 +222,7 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
             if (user.getName() == name) {
                 user.setCode(createCode().toString())
                 userRepository.save(user)
-                return responseService.getSuccessResult()
+                return responseService.getSuccessResult(2021, "인증코드 전송됨!", "${name}님의 이메일 주소 \n${user.username}으로 인증코드가 전송되었습니다.\n")
             }
         }
         throw UserNotFoundException() //해당되는 계정이 존재하지 않음
@@ -258,11 +263,11 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
             //인증코드가 같은가?
             if (compareToCode(user.getCode(), code)) {
                 initCode(user)
-                //user.activation()
                 user.setRole(Collections.singletonList("ROLE_PW"))
                 user.credentialsDeActivation()
+                user.setTokenCode(createTokenCode())
                 userRepository.save(user)
-                return responseService.getSingleResult(mapOf("token" to jwtTokenProvider.createChangePasswordToken(user.getPk().toString(), Collections.singletonList("ROLE_PW"))))
+                return responseService.getSingleResult(2022, "인증 성공!", "인증에 성공하였습니다.", mapOf("token" to jwtTokenProvider.createChangePasswordToken(user)))
             }
             throw WrongCodeException() //인증코드가 틀림!
         }
@@ -272,18 +277,18 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
     @RequestMapping(path = ["/password"], method = [RequestMethod.PATCH])
     fun changePassword(@RequestBody body: Map<String, String>): CommonResult {
         val password = body["password"]
-        val rPassword = body["rPassword"]
+        val vPassword = body["vPassword"]
         val authentication: Authentication = SecurityContextHolder.getContext().authentication
 
         //값이 유효한지 검사
-        if (password.isNullOrEmpty() || rPassword.isNullOrEmpty()) {
+        if (password.isNullOrEmpty() || vPassword.isNullOrEmpty()) {
             throw EmptyDataException()
         }
         Log.debug(tag, password)
-        Log.debug(tag, rPassword)
+        Log.debug(tag, vPassword)
 
         userRepository.findByEmail(authentication.name)?.let { user ->
-            if(password != rPassword) {
+            if(password != vPassword) {
                 Log.debug(tag, "패스워드가 맞지 않음..")
                 throw WrongPasswordException() // 패스워드가 맞지 않음!
             }
@@ -291,8 +296,9 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
             user.password = passwordEncoder.encode(password)
             user.setRole(Collections.singletonList("ROLE_USER"))
             user.credentialsActivation()
+            user.setTokenCode("")
             userRepository.save(user)
-            return responseService.getSuccessResult()
+            return responseService.getSuccessResult(2023, "패스워드 변경 성공!", "패스워드 변경에 성공하였습니다.")
         }
         throw UserNotFoundException()
     }
@@ -300,6 +306,10 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
     //코드를 생성함
     fun createCode(): Long {
         return Date().time
+    }
+
+    fun createTokenCode(): String {
+        return Date().time.toString().reversed().substring(0, 8)
     }
 
     //저장된 코드와 사용자가 입력한 코드를 비교함
