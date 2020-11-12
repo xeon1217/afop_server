@@ -8,8 +8,8 @@ import javax.servlet.http.HttpServletResponse
 
 @Component
 class CAuthenticationEntryPoint : AuthenticationEntryPoint {
-    private val exception: String = "/i18n/exception"
+    private val exception: String = "/exception"
     override fun commence(request: HttpServletRequest?, response: HttpServletResponse?, authException: AuthenticationException?) {
-        response?.sendRedirect("$exception/entrypoint")
+        response?.sendRedirect("$exception/access-denied")
     }
 }
