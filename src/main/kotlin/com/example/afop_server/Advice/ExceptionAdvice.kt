@@ -1,102 +1,62 @@
 package com.example.afop_server.Advice
 
+import com.example.afop.data.result.Response
+import com.example.afop.data.result.Result
 import com.example.afop_server.Advice.Exception.Auth.*
-import com.example.afop_server.Advice.Exception.Common.AuthenticationEntryPointException
+import com.example.afop_server.Advice.Exception.Common.AccessDeniedException
 import com.example.afop_server.Advice.Exception.Common.EmptyDataException
-import com.example.afop_server.Response.CommonResult
-import com.example.afop_server.Service.ResponseService
-import org.springframework.context.MessageSource
-import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.http.HttpStatus
+import com.example.afop_server.Response.ErrorCode
+import com.example.afop_server.Response.Error
 import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import javax.servlet.http.HttpServletRequest
 
 @RestControllerAdvice
-class ExceptionAdvice(private val responseService: ResponseService, private val messageSource: MessageSource) {
+class  ExceptionAdvice {
     // 공통
-    @ExceptionHandler(AuthenticationEntryPointException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected fun authenticationEntryPointException(request: HttpServletRequest, e: AuthenticationEntryPointException): CommonResult {
-        return responseService.getFailResult(getMessage("AuthenticationEntryPointException.code").toInt(), getMessage("AuthenticationEntryPointException.title_msg"), getMessage("AuthenticationEntryPointException.do_msg"))
-    }
+    @ExceptionHandler(AccessDeniedException::class)
+    protected fun accessDeniedException(request: HttpServletRequest, e: AccessDeniedException): Result<*> {
+        return Result(data = null, error = ErrorCode.ACCESS_DENIED)
+     }
 
     @ExceptionHandler(EmptyDataException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected fun emptyDataException(request: HttpServletRequest, e: EmptyDataException): CommonResult {
-        return responseService.getFailResult(getMessage("EmptyDataException.code").toInt(), getMessage("EmptyDataException.title_msg"), getMessage("EmptyDataException.do_msg"))
+    protected fun emptyDataException(request: HttpServletRequest, e: EmptyDataException): Result<*> {
+        return Result(data = null, error = ErrorCode.EMPTY_DATA)
     }
 
     @ExceptionHandler(Exception::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected fun exception(request: HttpServletRequest, e: Exception): CommonResult {
-        return responseService.getFailResult(getMessage("UnKnownException.code").toInt(), getMessage("UnKnownException.title_msg"), getMessage("UnKnownException.do_msg"))
+    protected fun exception(request: HttpServletRequest, e: Exception): Result<*> {
+        return Result(data = null, error = ErrorCode.NOT_DEFINE_ERROR)
     }
 
-    // 인증관련
     @ExceptionHandler(AlreadyUserEmailException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected fun alreadyUserEmailException(request: HttpServletRequest, e: AlreadyUserEmailException): CommonResult {
-        return responseService.getFailResult(getMessage("AlreadyUserEmailException.code").toInt(), getMessage("AlreadyUserEmailException.title_msg"), getMessage("AlreadyUserEmailException.do_msg"))
+    protected fun alreadyUserEmailException(request: HttpServletRequest, e: Exception): Result<*> {
+        return Result(data = null, error = ErrorCode.ALREADY_USER_EMAIL)
     }
 
     @ExceptionHandler(AlreadyUserNickNameException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected fun alreadyUserNickNameException(request: HttpServletRequest, e: AlreadyUserNickNameException): CommonResult {
-        return responseService.getFailResult(getMessage("AlreadyUserNickNameException.code").toInt(), getMessage("AlreadyUserNickNameException.title_msg"), getMessage("AlreadyUserNickNameException.do_msg"))
+    protected fun alreadyUserNickNameException(request: HttpServletRequest, e: Exception): Result<*> {
+        return Result(data = null, error = ErrorCode.ALREADY_USER_NICKNAME)
     }
 
-    @ExceptionHandler(CodeTimeoutException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected fun codeTimeoutException(request: HttpServletRequest, e: CodeTimeoutException): CommonResult {
-        return responseService.getFailResult(getMessage("CodeTimeoutException.code").toInt(), getMessage("CodeTimeoutException.title_msg"), getMessage("CodeTimeoutException.do_msg"))
-    }
-
-    @ExceptionHandler(ExpiredPasswordException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected fun expiredPasswordException(request: HttpServletRequest, e: ExpiredPasswordException): CommonResult {
-        return responseService.getFailResult(getMessage("ExpiredPasswordException.code").toInt(), getMessage("ExpiredPasswordException.title_msg"), getMessage("ExpiredPasswordException.do_msg"))
-    }
-
-    @ExceptionHandler(SignInFailedException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected fun signInFailedException(request: HttpServletRequest, e: SignInFailedException): CommonResult {
-        return responseService.getFailResult(getMessage("SignInFailedException.code").toInt(), getMessage("SignInFailedException.title_msg"), getMessage("SignInFailedException.do_msg"))
-    }
-
-    @ExceptionHandler(SignUpUserException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected fun signUpUserException(request: HttpServletRequest, e: SignUpUserException): CommonResult {
-        return responseService.getFailResult(getMessage("SignUpUserException.code").toInt(), getMessage("SignUpUserException.title_msg"), getMessage("SignUpUserException.do_msg"))
-    }
-
-
-    @ExceptionHandler(UserNotFoundException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected fun userNotFoundException(request: HttpServletRequest, e: UserNotFoundException): CommonResult {
-        return responseService.getFailResult(getMessage("UserNotFoundException.code").toInt(), getMessage("UserNotFoundException.title_msg"), getMessage("UserNotFoundException.do_msg"))
-    }
-
-    @ExceptionHandler(WrongCodeException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected fun wrongCodeException(request: HttpServletRequest, e: WrongCodeException): CommonResult {
-        return responseService.getFailResult(getMessage("WrongCodeException.code").toInt(), getMessage("WrongCodeException.title_msg"), getMessage("WrongCodeException.do_msg"))
+    @ExceptionHandler(RegisteringUserException::class)
+    protected fun registeringUserException(request: HttpServletRequest, e: Exception): Result<*> {
+        return Result(data = null, error = ErrorCode.REGISTERING_USER)
     }
 
     @ExceptionHandler(WrongPasswordException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected fun wrongPasswordException(request: HttpServletRequest, e: WrongPasswordException): CommonResult {
-        return responseService.getFailResult(getMessage("WrongPasswordException.code").toInt(), getMessage("WrongPasswordException.title_msg"), getMessage("WrongPasswordException.do_msg"))
+    protected fun wrongPasswordException(request: HttpServletRequest, e: Exception): Result<*> {
+        return Result(data = null, error = ErrorCode.WRONG_PASSWORD)
     }
 
-    private fun getMessage(code: String): String {
-        return getMessage(code, null)
+    @ExceptionHandler(ExpiredVerifyEmailException::class)
+    protected fun expiredVerifyEmailException(request: HttpServletRequest, e: Exception): Result<*> {
+        return Result(data = null, error = ErrorCode.EXPIRED_VERIFY_EMAIL)
     }
 
-    //args : 로케일 관련
-    private fun getMessage(code: String, args: List<Any>?): String {
-        return messageSource.getMessage(code, null, LocaleContextHolder.getLocale())
+    @ExceptionHandler(NotVerifyEmailException::class)
+    protected fun notVerifyEmailException(request: HttpServletRequest, e: Exception): Result<*> {
+        return Result(data = null, error = ErrorCode.NOT_VERIFY_EMAIL)
     }
 }
 

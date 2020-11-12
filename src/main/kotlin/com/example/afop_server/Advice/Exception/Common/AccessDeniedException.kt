@@ -1,6 +1,6 @@
-package com.example.afop_server.Advice.Exception.Auth
+package com.example.afop_server.Advice.Exception.Common
 
-class SignUpUserException : RuntimeException {
+class AccessDeniedException : RuntimeException {
     constructor(msg: String?, t: Throwable?) : super(msg, t) {}
     constructor(msg: String?) : super(msg) {}
     constructor() : super() {}
