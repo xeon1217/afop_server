@@ -1,20 +1,18 @@
 package com.example.afop_server.Controller
 
-import com.example.afop_server.Advice.Exception.Common.*
+import com.example.afop.data.result.Response
+import com.example.afop.data.result.Result
 import com.example.afop_server.Advice.Exception.Auth.*
-import com.example.afop_server.Common.Log
+import com.example.afop_server.Advice.Exception.Common.EmptyDataException
 import com.example.afop_server.Config.Security.JwtTokenProvider
 import com.example.afop_server.Model.User
 import com.example.afop_server.Repository.UserRepository
-import com.example.afop_server.Response.CommonResult
-import com.example.afop_server.Response.SingleResult
-import com.example.afop_server.Service.ResponseService
+import com.example.afop_server.Service.SendEmailService
 import org.springframework.http.HttpStatus
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 import java.util.*
+import javax.security.auth.login.FailedLoginException
 
 /**
  * 회원 인증 관련
@@ -23,10 +21,95 @@ import java.util.*
 
 @RestController
 @RequestMapping("/auth")
-class AuthController(private val passwordEncoder: PasswordEncoder, private val jwtTokenProvider: JwtTokenProvider, private val userRepository: UserRepository, private val responseService: ResponseService) {
+class AuthController(private val passwordEncoder: PasswordEncoder, private val jwtTokenProvider: JwtTokenProvider, private val userRepository: UserRepository, private val sendEmailService: SendEmailService) {
     private val tag = AuthController::class.simpleName
-    private val VAILDTIME = 1000L * 300; // 인증코드 유효시간 1000ms * 300s = 5m
+    private val VAILDTIME = 1000L * 300; // 인증코드 유효시간 1000ms * 300s = 5mfan p 5 min 47
 
+    //로그인
+    @PostMapping("/login")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    fun login(@RequestBody body: Map<String, String>): Result<Map<String, String>> {
+        val email = body["email"]
+        val password = body["password"]
+
+        if (email.isNullOrEmpty() || password.isNullOrEmpty()) {
+            throw EmptyDataException()
+        }
+
+        userRepository.findByEmail(email)?.let { user ->
+            if(!user.isVerifyEmail()) {
+                throw NotVerifyEmailException()
+            }
+            if(!passwordEncoder.matches(password, user.password)) {
+                throw WrongPasswordException()
+            }
+            user.tokenCode = (Date().time).toString()
+            userRepository.save(user)
+            return Result(data = mapOf("token" to jwtTokenProvider.createToken(user)), response = Response(success = true))
+        }
+        throw FailedLoginException()
+    }
+
+    //회원가입
+    @PostMapping("/register")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    fun register(@RequestBody body: Map<String, String>): Result<*> {
+        val email = body["email"] // 이메일
+        val rPassword = body["rPassword"] // 기준 패스워드
+        val vPassword = body["vPassword"] // 재 확인 패스워드
+        val name = body["name"] // 이름
+        val nickName = body["nickName"] // 닉네임
+
+        if(email.isNullOrEmpty() || rPassword.isNullOrEmpty() || vPassword.isNullOrEmpty() || name.isNullOrEmpty() || nickName.isNullOrEmpty()) {
+            throw EmptyDataException()
+        }
+
+        if(rPassword != vPassword) {
+            throw WrongPasswordException()
+        }
+
+        verifyEmail(email).response?.success?.let {
+            userRepository.save(User(email = email, password = passwordEncoder.encode(rPassword), name = name, nickName = nickName, role = "ROLE_USER"))
+            sendEmailService.registerMail(email, jwtTokenProvider.createVerifyEmailLink(email))
+            return Result(data = null, response = Response(success = true))
+        }
+        throw Exception()
+    }
+
+    //회원가입 전 이메일 중복 확인
+    @RequestMapping(path = ["/register/verify-email/{email}"], method = [RequestMethod.GET])
+    fun verifyEmail(@PathVariable email: String): Result<*> {
+        if (!email.contains("@")) {
+            throw Exception() //이메일 양식에 맞지 않음
+        }
+
+        userRepository.findByEmail(email)?.let { user ->
+            if (!user.isVerifyEmail()) {
+                throw RegisteringUserException()
+            }
+            throw AlreadyUserEmailException()
+        }
+        return Result(data = null, response = Response(success = true))
+    }
+
+    //회원가입 전 이메일 주소 확인
+    @RequestMapping(path = ["/register/verify-link/{link}"], method = [RequestMethod.GET])
+    fun verifyEmailLink(@PathVariable link: String) : Result<*> {
+        val email = jwtTokenProvider.validVerifyEmailLink(link)
+
+        userRepository.findByEmail(email)?.let {
+            if(it.isVerifyEmail()) {
+                throw ExpiredVerifyEmailException()
+            }
+            it.verifyEmail = true
+            userRepository.save(it)
+            return Result(data = null, response = Response(success = true))
+        }
+        throw ExpiredVerifyEmailException()
+    }
+
+
+    /*
     //로그인
     @PostMapping("/signin")
     fun signIn(@RequestBody body: Map<String, String>): SingleResult<Map<String, String>> {
@@ -312,6 +395,14 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
         throw UserNotFoundException()
     }
 
+    @GetMapping("/sendEmail")
+    @ResponseBody
+    fun sendEmail() {
+        sendEmailService.apply {
+            mailSend(createMail())
+        }
+    }
+
     //코드를 생성함
     fun createCode(): Long {
         return Date().time
@@ -341,4 +432,6 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
         user.setCode("")
         userRepository.save(user)
     }
+
+     */
 }
