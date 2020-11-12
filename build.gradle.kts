@@ -17,8 +17,6 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa") //Jpa
-    implementation("org.springframework.boot:spring-boot-starter-data-rest") //spring-boot-rest-api
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
@@ -26,14 +24,16 @@ dependencies {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
     implementation(group = "org.mariadb.jdbc", name = "mariadb-java-client")
-    implementation("org.springframework.boot:spring-boot-devtools") //spring-boot-devtools
+    implementation("io.jsonwebtoken:jjwt:0.9.1") //JsonWebToken library
+    implementation("net.rakugakibox.util:yaml-resource-bundle:1.1") //yml library
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor") //spring-boot-processor
     implementation("org.springframework.boot:spring-boot-configuration-processor") //spring-boot-processor
-
+    implementation("org.springframework.boot:spring-boot-devtools") //spring-boot-devtools
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa") //spring-boot-jpa
+    implementation("org.springframework.boot:spring-boot-starter-data-rest") //spring-boot-rest-api
     implementation("org.springframework.boot:spring-boot-starter-security") //spring-boot-security
-    implementation("io.jsonwebtoken:jjwt:0.9.1") //JsonWebToken library
-    implementation("net.rakugakibox.util:yaml-resource-bundle:1.1") //yml library
+    implementation("org.springframework.boot:spring-boot-starter-mail") //spring-boot-mail
 }
 
 tasks.withType<Test> {
