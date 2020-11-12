@@ -4,8 +4,6 @@ import com.example.afop_server.Advice.Exception.Auth.UserNotFoundException
 import com.example.afop_server.Advice.Exception.Auth.WrongPasswordException
 import com.example.afop_server.Advice.Exception.Common.EmptyDataException
 import com.example.afop_server.Repository.UserRepository
-import com.example.afop_server.Response.CommonResult
-import com.example.afop_server.Service.ResponseService
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -18,8 +16,9 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/member")
-class MemberController(private val passwordEncoder: PasswordEncoder, private val userRepository: UserRepository, private val responseService: ResponseService) {
+class MemberController(private val passwordEncoder: PasswordEncoder, private val userRepository: UserRepository) {
 
+    /*
     @RequestMapping(path = ["/password"], method = [RequestMethod.PATCH])
     fun changePassword(@RequestBody body: Map<String, String>): CommonResult {
         val oPassword = body["oPassword"] // 원래 패스워드
@@ -41,8 +40,8 @@ class MemberController(private val passwordEncoder: PasswordEncoder, private val
                 throw WrongPasswordException() // 기준 패스워드와 확인 패스워드가 일치하지 않음!
             }
 
-            user.password = passwordEncoder.encode(password)
-            user.credentialsActivation()
+            //user.password = passwordEncoder.encode(password)
+            //user.credentialsActivation()
             userRepository.save(user)
             return responseService.getSuccessResult()
         }
@@ -54,5 +53,5 @@ class MemberController(private val passwordEncoder: PasswordEncoder, private val
         return responseService.getSuccessResult()
     }
 
-    fun changeEmail() {}
+     */
 }
