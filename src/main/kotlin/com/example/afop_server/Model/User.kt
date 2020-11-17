@@ -9,7 +9,7 @@ import javax.persistence.*
 import kotlin.collections.ArrayList
 
 @Entity
-@Table(name = "users")
+@Table(name = "user")
 class User(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,5 +53,6 @@ class User(
     //계정이 잠겨있지 않는지?
     override fun isAccountNonLocked() = true
 
+    //이메일 인증을 마친 상태인지?
     fun isVerifyEmail() = verifyEmail
 }

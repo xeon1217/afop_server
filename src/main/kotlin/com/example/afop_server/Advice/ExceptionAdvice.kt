@@ -58,6 +58,16 @@ class  ExceptionAdvice {
     protected fun notVerifyEmailException(request: HttpServletRequest, e: Exception): Result<*> {
         return Result(data = null, error = ErrorCode.NOT_VERIFY_EMAIL)
     }
+
+    @ExceptionHandler(ExpiredTokenException::class)
+    protected fun expiredTokenException(request: HttpServletRequest, e: Exception): Result<*> {
+        return Result(data = null, error = ErrorCode.EXPIRED_TOKEN)
+    }
+
+    @ExceptionHandler(FailedLoginException::class)
+    protected fun failedLoginException(request: HttpServletRequest, e: Exception): Result<*> {
+        return Result(data = null, error = ErrorCode.FAILED_LOGIN)
+    }
 }
 
 /**

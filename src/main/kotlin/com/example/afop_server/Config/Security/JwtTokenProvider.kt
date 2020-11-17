@@ -1,5 +1,6 @@
 package com.example.afop_server.Config.Security
 
+import com.example.afop_server.Advice.Exception.Auth.ExpiredTokenException
 import com.example.afop_server.Model.User
 import com.example.afop_server.Service.CUserDetailService
 import io.jsonwebtoken.Claims
@@ -75,21 +76,22 @@ class JwtTokenProvider(private val userDetailsService: CUserDetailService) {
     }
 
     fun getUserPk(token: String): String {
-        println(Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).body.subject)
+        //println(Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).body.subject)
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).body.subject
     }
 
     fun getTokenCode(token: String): String {
-        println(Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).body.id)
+        //println(Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).body.id)
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).body.id
     }
 
     fun getAuthentication(token: String): Authentication? {
-        val userDetails = userDetailsService.loadUserByUsername(this.getUserPk(token))
-        if (userDetails?.tokenCode != this.getTokenCode(token)) {
-            return null
+        val userDetails = userDetailsService.loadUserByUsername(getUserPk(token))
+        return if (userDetails?.tokenCode == getTokenCode(token)) {
+            UsernamePasswordAuthenticationToken(userDetails, "", userDetails.authorities)
+        } else {
+            null
         }
-        return UsernamePasswordAuthenticationToken(userDetails, "", userDetails.authorities)
     }
 
     fun resolveToken(request: HttpServletRequest): String? {

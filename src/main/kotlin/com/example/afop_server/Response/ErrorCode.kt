@@ -21,9 +21,10 @@ enum class ErrorCode(val status: Int, val code: String, val message: String) {
     ALREADY_USER_EMAIL(400, "", "이미 존재하는 이메일입니다."),
     ALREADY_USER_NICKNAME(400, "", "이미 존재하는 닉네임입니다."),
     EXPIRED_USER_PASSWORD(403, "", "패스워드가 만료되었습니다."),
+    EXPIRED_VERIFY_EMAIL(400, "", "만료된 링크입니다!"),
+    EXPIRED_TOKEN(403, "", "토큰이 만료되었습니다!"),
     NOT_VERIFY_EMAIL(403, "", "이메일 인증 절차가 끝나지 않았습니다."),
     REGISTERING_USER(409, "", "이미 회원가입 중인 계정입니다."),
-    EXPIRED_VERIFY_EMAIL(400, "", "만료된 링크입니다!"),
     FAILED_LOGIN(400, "", "로그인에 실패했습니다."),
-    WRONG_PASSWORD(400, "", "기준 패스워드와 패스워드 확인값이 일치하지 않습니다.")
+    WRONG_PASSWORD(400, "", "기준 패스워드와 패스워드 확인값이 일치하지 않습니다."),
 }

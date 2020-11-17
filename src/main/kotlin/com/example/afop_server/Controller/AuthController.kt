@@ -6,13 +6,16 @@ import com.example.afop_server.Advice.Exception.Auth.*
 import com.example.afop_server.Advice.Exception.Common.EmptyDataException
 import com.example.afop_server.Config.Security.JwtTokenProvider
 import com.example.afop_server.Model.User
+import com.example.afop_server.Model.UserDTO
 import com.example.afop_server.Repository.UserRepository
 import com.example.afop_server.Service.SendEmailService
+import org.springframework.data.repository.query.Param
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 import java.util.*
-import javax.security.auth.login.FailedLoginException
 
 /**
  * 회원 인증 관련
@@ -28,7 +31,7 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
     //로그인
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun login(@RequestBody body: Map<String, String>): Result<Map<String, String>> {
+    fun login(@RequestBody body: Map<String, String>): Result<UserDTO> {
         val email = body["email"]
         val password = body["password"]
 
@@ -43,9 +46,31 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
             if(!passwordEncoder.matches(password, user.password)) {
                 throw WrongPasswordException()
             }
+            return Result(data = getUser(email), response = Response(success = true))
+        }
+        throw FailedLoginException()
+    }
+
+    @PostMapping("/auto-login")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    fun autoLogin(): Result<UserDTO> {
+        val authentication: Authentication = SecurityContextHolder.getContext().authentication
+        return Result(data = getUser(authentication.name), response = Response(success = true))
+    }
+
+    private fun getUser(email: String): UserDTO {
+        userRepository.findByEmail(email)?.let { user ->
             user.tokenCode = (Date().time).toString()
             userRepository.save(user)
-            return Result(data = mapOf("token" to jwtTokenProvider.createToken(user)), response = Response(success = true))
+            val userData = UserDTO(
+                    uid = user.getID(),
+                    fcmToken = user.fcmToken,
+                    token = jwtTokenProvider.createToken(user),
+                    email = user.username,
+                    name = user.name,
+                    nickname = user.nickName
+            )
+            return userData
         }
         throw FailedLoginException()
     }
@@ -77,8 +102,9 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
     }
 
     //회원가입 전 이메일 중복 확인
-    @RequestMapping(path = ["/register/verify-email/{email}"], method = [RequestMethod.GET])
-    fun verifyEmail(@PathVariable email: String): Result<*> {
+    @RequestMapping(path = ["/register/verify"], method = [RequestMethod.GET])
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    fun verifyEmail(@Param("email") email: String): Result<*> {
         if (!email.contains("@")) {
             throw Exception() //이메일 양식에 맞지 않음
         }
@@ -92,8 +118,9 @@ class AuthController(private val passwordEncoder: PasswordEncoder, private val j
         return Result(data = null, response = Response(success = true))
     }
 
-    //회원가입 전 이메일 주소 확인
-    @RequestMapping(path = ["/register/verify-link/{link}"], method = [RequestMethod.GET])
+    //회원가입 후 이메일 주소 확인
+    @RequestMapping(path = ["/register/verify/{link}"], method = [RequestMethod.GET])
+    @ResponseStatus(HttpStatus.ACCEPTED)
     fun verifyEmailLink(@PathVariable link: String) : Result<*> {
         val email = jwtTokenProvider.validVerifyEmailLink(link)
 
