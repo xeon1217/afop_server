@@ -25,7 +25,7 @@ class SendEmailService {
                         "http://" +
                         "jungyoon.dynu.net" +
                         ":8081" +
-                        "/auth/register/verify" +
+                        "/auth/register/verify/" +
                         verifyAdress
         ))
     }
