@@ -24,7 +24,7 @@ class SendEmailService {
                 message = "링크를 눌러 인증을 완료합니다.\n" +
                         "http://" +
                         "jungyoon.dynu.net" +
-                        ":8081" +
+                        ":8081/auth/register/" +
                         verifyAdress
         ))
     }
