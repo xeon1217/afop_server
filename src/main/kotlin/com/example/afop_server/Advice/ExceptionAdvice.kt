@@ -5,6 +5,8 @@ import com.example.afop.data.result.Result
 import com.example.afop_server.Advice.Exception.Auth.*
 import com.example.afop_server.Advice.Exception.Common.AccessDeniedException
 import com.example.afop_server.Advice.Exception.Common.EmptyDataException
+import com.example.afop_server.Advice.Exception.File.FileDownloadException
+import com.example.afop_server.Advice.Exception.File.FileUploadException
 import com.example.afop_server.Response.ErrorCode
 import com.example.afop_server.Response.Error
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -67,6 +69,16 @@ class  ExceptionAdvice {
     @ExceptionHandler(FailedLoginException::class)
     protected fun failedLoginException(request: HttpServletRequest, e: Exception): Result<*> {
         return Result(data = null, error = ErrorCode.FAILED_LOGIN)
+    }
+
+    @ExceptionHandler(FileUploadException::class)
+    protected fun fileUploadException(request: HttpServletRequest, e: Exception): Result<*> {
+        return Result(data = null, error = ErrorCode.FILE_UPLOAD_FAIL)
+    }
+
+    @ExceptionHandler(FileDownloadException::class)
+    protected fun fileDownloadException(request: HttpServletRequest, e: Exception): Result<*> {
+        return Result(data = null, error = ErrorCode.FILE_DOWNLOAD_FAIL)
     }
 }
 

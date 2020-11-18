@@ -27,4 +27,8 @@ enum class ErrorCode(val status: Int, val code: String, val message: String) {
     REGISTERING_USER(409, "", "이미 회원가입 중인 계정입니다."),
     FAILED_LOGIN(400, "", "로그인에 실패했습니다."),
     WRONG_PASSWORD(400, "", "기준 패스워드와 패스워드 확인값이 일치하지 않습니다."),
+
+    //File
+    FILE_DOWNLOAD_FAIL(400, "", "파일 다운로드에 실패했습니다."),
+    FILE_UPLOAD_FAIL(400, "", "파일 업로드에 실패했습니다.")
 }

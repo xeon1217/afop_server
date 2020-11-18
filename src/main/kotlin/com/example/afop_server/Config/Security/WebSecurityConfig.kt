@@ -36,6 +36,8 @@ class WebSecurityConfig(private val jwtTokenProvider: JwtTokenProvider) : WebSec
                     .antMatchers(HttpMethod.PATCH,"/auth/password").hasRole("PW") // 비 로그인한 유저의 패스워드 변경은 토큰을 발급받아야 함
                     .antMatchers("/admin/**").hasRole("ADMIN")
                     .antMatchers(HttpMethod.GET, "/market/**").permitAll()
+                    .antMatchers(HttpMethod.GET, "/image/**").permitAll()
+                    .antMatchers(HttpMethod.GET, "/files/**").permitAll()
                     //.antMatchers("/market/**").permitAll()
                     .anyRequest().authenticated() // 그 외의 리소스는 인증된 회원만 사용 가능
                     .and()

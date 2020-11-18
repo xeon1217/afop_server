@@ -26,7 +26,7 @@ import java.util.*
 @RequestMapping("/auth")
 class AuthController(private val passwordEncoder: PasswordEncoder, private val jwtTokenProvider: JwtTokenProvider, private val userRepository: UserRepository, private val sendEmailService: SendEmailService) {
     private val tag = AuthController::class.simpleName
-    private val VAILDTIME = 1000L * 300; // 인증코드 유효시간 1000ms * 300s = 5mfan p 5 min 47
+    private val VAILDTIME = 1000L * 300; // 인증코드 유효시간 1000ms * 300s
 
     //로그인
     @PostMapping("/login")
