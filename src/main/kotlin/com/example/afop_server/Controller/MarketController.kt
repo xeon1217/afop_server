@@ -60,8 +60,11 @@ class MarketController(private val userRepository: UserRepository, private val m
     @PostMapping("/item")
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun marketPutItem(@RequestBody item: MarketDTO?): Result<MarketDTO> {
-        item?.let {
-            marketRepository.save(item)
+        item?.apply {
+            if(sellerUID.isNullOrEmpty()) {
+                throw EmptyDataException()
+            }
+            marketRepository.save(this)
             return Result(data = null, response = Response(success = true))
         }
         throw EmptyDataException()
@@ -70,9 +73,12 @@ class MarketController(private val userRepository: UserRepository, private val m
     @PutMapping("/item")
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun marketModifyItem(@RequestBody item: MarketDTO?): Result<MarketDTO> {
-        item?.let {
-            marketRepository.save(item)
-            return Result(data = item, response = Response(success = true))
+        item?.apply {
+            if(sellerUID.isNullOrEmpty()) {
+                throw EmptyDataException()
+            }
+            marketRepository.save(this)
+            return Result(data = this, response = Response(success = true))
         }
         throw EmptyDataException()
     }
