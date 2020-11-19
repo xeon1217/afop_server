@@ -6,6 +6,7 @@ import com.example.afop_server.Service.FileStorageService
 import org.apache.tomcat.util.http.fileupload.IOUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
+import org.springframework.data.repository.query.Param
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -36,9 +37,11 @@ class FileStorageController {
         return Result(data = null, response = Response(success = true))
     }
 
-    @GetMapping("/{fileName}")
-    fun downloadFile(@PathVariable fileName: String, request: HttpServletRequest, response: HttpServletResponse): ResponseEntity<Resource> {
-        val resource: Resource = service.loadFileAsResource(fileName = fileName)
+    @RequestMapping(path = ["/download"], method = [RequestMethod.GET])
+    fun downloadFile(@Param("file") file: String, request: HttpServletRequest, response: HttpServletResponse): ResponseEntity<Resource> {
+
+        println(file)
+        val resource: Resource = service.loadFileAsResource(fileName = file)
         var contentType: String = "image/jpeg"
         try {
             contentType = request.servletContext.getMimeType(resource.file.absolutePath)
@@ -52,10 +55,18 @@ class FileStorageController {
         //response.contentType = "image/jpeg"
         //response.outputStream.write(resource.file.readBytes())
 
+        println("$resource")
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.filename + "\"")
                 .body(resource)
+    }
+
+    @RequestMapping(path = ["/downloads"], method = [RequestMethod.GET])
+    fun downloadMultipleFiles(@Param("files") files: ArrayList<String>) {
+        files.forEach {
+            service.loadFileAsResource(it)
+        }
     }
 }
