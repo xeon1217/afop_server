@@ -8,7 +8,7 @@ data class MarketDTO(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val marketID: Long? = null, //글 아이디
-        val sellerUID: String? = null, //판매자
+        var sellerUID: String? = null, //판매자
         val buyerUID: String? = null, //구매자
         var title: String? = null, //제목
 

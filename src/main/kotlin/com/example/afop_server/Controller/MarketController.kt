@@ -12,8 +12,10 @@ import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import java.util.*
 
 @RestController
 @RequestMapping("/market")
@@ -61,8 +63,11 @@ class MarketController(private val userRepository: UserRepository, private val m
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun marketPutItem(@RequestBody item: MarketDTO?): Result<MarketDTO> {
         item?.apply {
-            if(sellerUID.isNullOrEmpty()) {
-                throw EmptyDataException()
+            item.apply {
+                userRepository.findByEmail(SecurityContextHolder.getContext().authentication.name)?.apply {
+                    sellerUID = getID()
+                    timeStamp = Date().time
+                }
             }
             marketRepository.save(this)
             return Result(data = null, response = Response(success = true))
