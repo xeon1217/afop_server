@@ -21,9 +21,6 @@ import java.util.*
 @RequestMapping("/market")
 class MarketController(private val userRepository: UserRepository, private val marketRepository: MarketRepository) {
 
-    @Autowired
-    private lateinit var service: FileStorageService
-
     @RequestMapping(path = ["/items"], method = [RequestMethod.GET])
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun marketGetList(@Param("title") title: String?, @Param("last_id_cursor") last_id_cursor: Long?): Result<List<MarketDTO?>> {

@@ -12,13 +12,13 @@ interface MarketRepository : JpaRepository<MarketDTO?, Long> {
     @Query(value = "SELECT * FROM market WHERE marketID = :market_id", nativeQuery = true)
     fun getItem(@Param("market_id") market_id: Long): MarketDTO?
 
-    @Query(value = "SELECT * FROM market ORDER BY time_stamp DESC LIMIT 25", nativeQuery = true)
+    @Query(value = "SELECT * FROM market ORDER BY time_stamp DESC LIMIT 10", nativeQuery = true)
     fun getList(): List<MarketDTO?>
 
-    @Query(value = "SELECT * FROM market WHERE marketID < :last_id_cursor ORDER BY time_stamp DESC LIMIT 25", nativeQuery = true)
+    @Query(value = "SELECT * FROM market WHERE marketID < :last_id_cursor ORDER BY time_stamp DESC LIMIT 10", nativeQuery = true)
     fun getList(@Param("last_id_cursor") last_id_cursor: Long): List<MarketDTO?>
 
-    @Query(value = "SELECT * FROM market WHERE marketID < :last_id_cursor ORDER BY time_stamp DESC LIMIT 25 LIKE %:title%", nativeQuery = true)
+    @Query(value = "SELECT * FROM market WHERE marketID < :last_id_cursor ORDER BY time_stamp DESC LIMIT 10 LIKE %:title%", nativeQuery = true)
     fun getList(@Param("title") title: String, @Param("last_id_cursor") last_id_cursor: Long): List<MarketDTO?>
 
 }
