@@ -15,13 +15,11 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 
 @Service
-class FileStorageService {
+class FileStorageService @Autowired constructor(properties: FileStorageProperties) {
 
-    private val fileStorageLocation: Path
+    private val fileStorageLocation: Path = Paths.get(properties.getUploadDir()).toAbsolutePath().normalize()
 
-    @Autowired
-    constructor(properties: FileStorageProperties) {
-        fileStorageLocation = Paths.get(properties.getUploadDir()).toAbsolutePath().normalize()
+    init {
         try {
             Files.createDirectories(fileStorageLocation)
         } catch (e: Exception) {

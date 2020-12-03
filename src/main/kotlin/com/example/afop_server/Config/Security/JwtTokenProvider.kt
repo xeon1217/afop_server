@@ -1,7 +1,6 @@
 package com.example.afop_server.Config.Security
 
-import com.example.afop_server.Advice.Exception.Auth.ExpiredTokenException
-import com.example.afop_server.Model.User
+import com.example.afop_server.Model.UserDAO
 import com.example.afop_server.Service.CUserDetailService
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
@@ -45,7 +44,7 @@ class JwtTokenProvider(private val userDetailsService: CUserDetailService) {
         throw Exception()
     }
 
-    fun createToken(user: User): String {
+    fun createToken(user: UserDAO): String {
         val now = Date()
         val claims: Claims = Jwts.claims()
                 .setSubject(user.getID())
@@ -60,7 +59,7 @@ class JwtTokenProvider(private val userDetailsService: CUserDetailService) {
                 .compact()
     }
 
-    fun createChangePasswordToken(user: User): String {
+    fun createChangePasswordToken(user: UserDAO): String {
         val now = Date()
         val claims: Claims = Jwts.claims()
                 .setSubject(user.getID())

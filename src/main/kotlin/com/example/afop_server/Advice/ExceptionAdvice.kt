@@ -1,17 +1,15 @@
 package com.example.afop_server.Advice
 
-import com.example.afop.data.result.Response
-import com.example.afop.data.result.Result
 import com.example.afop_server.Advice.Exception.Auth.*
 import com.example.afop_server.Advice.Exception.Common.AccessDeniedException
 import com.example.afop_server.Advice.Exception.Common.EmptyDataException
 import com.example.afop_server.Advice.Exception.File.FileDownloadException
 import com.example.afop_server.Advice.Exception.File.FileUploadException
-import com.example.afop_server.Response.ErrorCode
-import com.example.afop_server.Response.Error
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import javax.servlet.http.HttpServletRequest
+import com.example.afop_server.Response.Result
+import com.example.afop_server.Response.ErrorCode
 
 @RestControllerAdvice
 class  ExceptionAdvice {

@@ -38,6 +38,10 @@ class WebSecurityConfig(private val jwtTokenProvider: JwtTokenProvider) : WebSec
                     .antMatchers(HttpMethod.GET, "/market/**").permitAll()
                     .antMatchers(HttpMethod.GET, "/image/**").permitAll()
                     .antMatchers(HttpMethod.GET, "/files/**").permitAll()
+                    .antMatchers("/chat/**").permitAll() // 임시
+                    .antMatchers("/pub/**").permitAll() // 임시
+                    .antMatchers("/sub/**").permitAll() // 임시
+                    .antMatchers("/ws-stomp/**").permitAll() // 임시
                     //.antMatchers("/market/**").permitAll()
                     .anyRequest().authenticated() // 그 외의 리소스는 인증된 회원만 사용 가능
                     .and()

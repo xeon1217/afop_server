@@ -1,13 +1,24 @@
 package com.example.afop_server.Model
 
+import org.hibernate.annotations.GenericGenerator
+import java.io.Serializable
 import javax.persistence.*
 
 @Entity
+@IdClass(MarketDTOId::class)
 @Table(name = "market")
 data class MarketDTO(
         @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val marketID: Long? = null, //글 아이디
+        @GeneratedValue(generator = "uuid2")
+        @GenericGenerator(name = "uuid2", strategy = "uuid2")
+        @Column(columnDefinition = "CHAR(36)")
+        val id: String, //글 아이디
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.AUTO)
+        @Column(name = "seq", unique = true)
+        val seq: Long,
+
         var sellerUID: String? = null, //판매자
         val buyerUID: String? = null, //구매자
         var title: String? = null, //제목
@@ -24,9 +35,18 @@ data class MarketDTO(
         @ElementCollection(fetch = FetchType.EAGER)
         var images: List<String>? = null//사진, 10장까지
 ) {
-        enum class State(val string: String) {
-                SOLD("판매중"),
-                RESERVATION("예약중"),
-                SOLD_OUT("판매완료")
-        }
+    enum class State(val state: String) {
+        SOLD("판매중"),
+        RESERVATION("예약중"),
+        SOLD_OUT("판매완료")
+    }
+
+    enum class Category(val category: String) {
+
+    }
+}
+
+class MarketDTOId : Serializable {
+    val id: String? = null
+    val seq: Long? = null
 }

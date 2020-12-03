@@ -1,7 +1,7 @@
 package com.example.afop_server.Controller
 
-import com.example.afop.data.result.Response
-import com.example.afop.data.result.Result
+import com.example.afop_server.Response.Result
+import com.example.afop_server.Response.Response
 import com.example.afop_server.Service.FileStorageService
 import org.apache.tomcat.util.http.fileupload.IOUtils
 import org.springframework.beans.factory.annotation.Autowired

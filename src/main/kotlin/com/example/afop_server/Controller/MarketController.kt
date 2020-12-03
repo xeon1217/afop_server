@@ -1,7 +1,7 @@
 package com.example.afop_server.Controller
 
-import com.example.afop.data.result.Response
-import com.example.afop.data.result.Result
+import com.example.afop_server.Response.Result
+import com.example.afop_server.Response.Response
 import com.example.afop_server.Advice.Exception.Common.EmptyDataException
 import com.example.afop_server.Model.MarketDTO
 import com.example.afop_server.Repository.MarketRepository
@@ -47,7 +47,7 @@ class MarketController(private val userRepository: UserRepository, private val m
 
     @RequestMapping(path = ["/item"], method = [RequestMethod.GET])
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun marketGetItem(@Param("market_id") market_id: Long?): Result<MarketDTO?> {
+    fun marketGetItem(@Param("market_id") market_id: String?): Result<MarketDTO?> {
         if (market_id != null) {
             marketRepository.getItem(market_id = market_id)?.let {
                 return Result(data = it, response = Response(success = true))
@@ -58,18 +58,16 @@ class MarketController(private val userRepository: UserRepository, private val m
 
     @PostMapping("/item")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun marketPutItem(@RequestBody item: MarketDTO?): Result<MarketDTO> {
-        item?.apply {
-            item.apply {
-                userRepository.findByEmail(SecurityContextHolder.getContext().authentication.name)?.apply {
-                    sellerUID = getID()
-                    timeStamp = Date().time
-                }
+    fun marketPutItem(@RequestBody item: MarketDTO): Result<MarketDTO> {
+        item.apply {
+            userRepository.findByEmail(SecurityContextHolder.getContext().authentication.name)?.apply {
+                sellerUID = getID()
+                timeStamp = Date().time
             }
             marketRepository.save(this)
             return Result(data = null, response = Response(success = true))
         }
-        throw EmptyDataException()
+        //throw EmptyDataException()
     }
 
     @PutMapping("/item")

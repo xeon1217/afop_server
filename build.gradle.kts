@@ -34,6 +34,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-rest") //spring-boot-rest-api
     implementation("org.springframework.boot:spring-boot-starter-security") //spring-boot-security
     implementation("org.springframework.boot:spring-boot-starter-mail") //spring-boot-mail
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
 }
 
 tasks.withType<Test> {

@@ -1,4 +1,4 @@
-package com.example.afop.data.result
+package com.example.afop_server.Response
 
 import com.example.afop_server.Response.Error
 

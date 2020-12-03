@@ -1,121 +1,61 @@
 package com.example.afop_server.Model
 
+import org.hibernate.annotations.GenericGenerator
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
+import java.util.*
 import java.util.stream.Collectors
 import javax.persistence.*
+import kotlin.collections.ArrayList
 
-/*
 @Entity
 @Table(name = "user")
-data class UserDAO(
-        var email: String,
-        var password: String,
+class UserDAO(
+        @Id
+        @GeneratedValue(generator = "uuid2")
+        @GenericGenerator(name = "uuid2", strategy = "uuid2")
+        @Column(columnDefinition = "CHAR(36)")
+        private val id: String = "",
+        private val email: String,
+        private val password: String,
         var name: String,
         var nickName: String,
-        var createDate: Long,
-        var authCode: String,
-        @ElementCollection(fetch = FetchType.EAGER)
-        private var roles: List<String>
+        var role: String,
+        var tokenCode: String? = null,
+        var fcmToken: String? = null,
+        var createTimeStamp: Long = Date().time,
+        var verifyEmail: Boolean = false
 ) : UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private val id: Long? = null
-    private var enable: Boolean = false //계정이 만료되었는지? (회원가입 중인지 아닌지를 판별)
-    private var credentials: Boolean = true //패스워드가 만료되었는지?
-    private var tokenCode: String = ""
+    //계정의 primaryKey를 반환함
+    fun getID() = id
 
-    fun getPk(): Long {
-        return id!!
-    }
+    //계정의 이름을 반환
+    override fun getUsername() = email
 
-    override fun getPassword(): String {
-        return password
-    }
+    //계정의 비밀번호를 반환
+    override fun getPassword() = password
 
-    fun setPassword(_password: String) {
-        password = _password
-    }
-
-    fun getName(): String {
-        return name
-    }
-
-    fun getNickName(): String {
-        return nickName
-    }
-
-    fun getCreateDate(): Long {
-        return createDate
-    }
-
-    fun getCode(): String {
-        return authCode
-    }
-
-    fun setCode(_code: String) {
-        authCode = _code
-    }
-
-    fun getRole(): List<String> {
-        return roles
-    }
-
-    fun setRole(_roles: List<String>) {
-        roles = _roles
-    }
-
-    fun getTokenCode(): String {
-        return tokenCode
-    }
-
-    fun setTokenCode(_code: String) {
-        tokenCode = _code
-    }
-
+    //계정이 갖고있는 권한 목록을 반환
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        return roles.stream().map { role -> SimpleGrantedAuthority("ROLE_$role") }.collect(Collectors.toSet())
+        val authorities = ArrayList<GrantedAuthority>()
+        authorities.add(SimpleGrantedAuthority(role))
+        return authorities
         //return roles.stream().map { role -> SimpleGrantedAuthority("ROLE_$role") }.collect(Collectors.toSet())
-        //.map(SimpleGrantedAuthority::new) 코틀린 대응 https://stackoverrun.com/ko/q/12453840
-        //또는 .map(::SimpleGrantedAuthority)
     }
 
-    override fun isEnabled(): Boolean { // 계정이 사용 가능한 계정인지
-        return enable
-    }
+    //계정이 활성화되어 있는지?
+    override fun isEnabled() = true
 
-    override fun getUsername(): String {
-        return username
-    }
+    //계정의 비밀번호가 만료되지 않는지?
+    override fun isCredentialsNonExpired() = true
 
-    fun activation() {
-        enable = true
-    }
+    //계정이 만료되지 않는지?
+    override fun isAccountNonExpired() = true
 
-    fun deActivation() {
-        enable = false
-    }
+    //계정이 잠겨있지 않는지?
+    override fun isAccountNonLocked() = true
 
-    override fun isCredentialsNonExpired(): Boolean { // 계정의 패스워드가 만료되지 않았는지
-        return credentials
-    }
-
-    fun credentialsActivation() {
-        credentials = true
-    }
-
-    fun credentialsDeActivation() {
-        credentials = false
-    }
-
-    override fun isAccountNonExpired(): Boolean { // 계정이 만료되지 않았는지
-        return true
-    }
-
-    override fun isAccountNonLocked(): Boolean { // 계정이 잠겨있지 않은지
-        return true
-    }
+    //이메일 인증을 마친 상태인지?
+    fun isVerifyEmail() = verifyEmail
 }
-
- */
